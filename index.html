@@ -9,78 +9,145 @@
 </head>
 
 <body class="w3-black">
-    <canvas class="w3-display-middle" id="myCanvas" width="1000" height="1000" style="border:2px solid #6e6e6e;">
-    </canvas>
+    <canvas class="w3-display-middle" id="myCanvas" width="1920" height="900" style="border:2px solid #6e6e6e;"></canvas>
     <script>
-        // #region Paredes  
-        //linea 1
         var c = document.getElementById("myCanvas");
         var w = c.width;
         var h = c.height;
         var ctx = c.getContext("2d");
-        ctx.strokeStyle = "white";
-        ctx.moveTo(0, 0);
-        ctx.lineTo(w / 3, h / 3);
-        ctx.stroke();
-        //linea 2
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-        ctx.strokeStyle = "white";
-        ctx.moveTo(0, h);
-        ctx.lineTo(w / 3, h / 3 * 2);
-        ctx.stroke();
-        //linea 3
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-        ctx.strokeStyle = "white";
-        ctx.moveTo(w, 0);
-        ctx.lineTo(w - w / 3, h / 3);
-        ctx.stroke();
-        //linea 4
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-        ctx.strokeStyle = "white";
-        ctx.moveTo(w, h);
-        ctx.lineTo(w - w / 3, h - h / 3);
-        ctx.stroke();
-        //linea 1 y 2 - techo
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-        ctx.strokeStyle = "white";
-        ctx.moveTo(w / 3, h / 3);
-        ctx.lineTo(w - w / 3, h / 3);
-        ctx.stroke();
-        //linea 3 y 4 - piso
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-        ctx.strokeStyle = "white";
-        ctx.moveTo(w - w/3, h - h / 3);
-        ctx.lineTo(w/3, h - h / 3);
-        ctx.stroke();
+        var mouse = { x: -100, y: -100 }; // Posición inicial del mouse fuera del canvas
+        var circle = { x: w / 2, y: h / 2, radius: 42 };
+        var glowRadius = 100; // Radio del efecto de luz exterior
+        var flashlightRadius = 200; // Radio del efecto de linterna (dentro del círculo)
+        var explosion = { active: false, radius: 0, maxRadius: Math.sqrt(w * w + h * h) }; // Radio máximo para cubrir toda la pantalla
 
-        //linea 1 y 2 - cornisa
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-        ctx.strokeStyle = "white";
-        ctx.moveTo(w / 3, h - h / 3);
-        ctx.lineTo(w / 3, h / 3);
-        ctx.stroke();
-        //linea 3 y 4 - cornisa
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-        ctx.strokeStyle = "white";
-        ctx.moveTo(w - w / 3, h / 3);
-        ctx.lineTo(w - w/ 3, h - h/3);
-        ctx.stroke();
-        // #endregion
+        // Dibujar las paredes y el círculo
+        function drawScene() {
+            ctx.clearRect(0, 0, w, h); // Limpiar el canvas
 
-        // #region Aleph
-        var c = document.getElementById("myCanvas");
-        var ctx = c.getContext("2d");
-        ctx.beginPath();
-        ctx.arc(w /  2, h /  2, 42 , 0, 2 * Math.PI);
-        ctx.stroke();
-        // #endregion
+            // Dibujar las paredes
+            ctx.strokeStyle = "white";
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(w / 3, h / 3);
+            ctx.moveTo(0, h);
+            ctx.lineTo(w / 3, (h / 3) * 2);
+            ctx.moveTo(w, 0);
+            ctx.lineTo(w - w / 3, h / 3);
+            ctx.moveTo(w, h);
+            ctx.lineTo(w - w / 3, h - h / 3);
+            ctx.moveTo(w / 3, h / 3);
+            ctx.lineTo(w - w / 3, h / 3);
+            ctx.moveTo(w - w / 3, h - h / 3);
+            ctx.lineTo(w / 3, h - h / 3);
+            ctx.moveTo(w / 3, h - h / 3);
+            ctx.lineTo(w / 3, h / 3);
+            ctx.moveTo(w - w / 3, h / 3);
+            ctx.lineTo(w - w / 3, h - h / 3);
+            ctx.stroke();
+
+            // Dibujar el círculo
+            ctx.beginPath();
+            ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+            ctx.stroke();
+
+            // Calcular la distancia entre el mouse y el círculo
+            var dx = mouse.x - circle.x;
+            var dy = mouse.y - circle.y;
+            var distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Primer efecto: Luz que sigue la dirección del mouse (fuera del círculo)
+            if (distance > circle.radius && distance < glowRadius + circle.radius) {
+                var angle = Math.atan2(dy, dx); // Ángulo entre el círculo y el mouse
+                var offsetX = Math.cos(angle) * 20; // Desplazamiento en X
+                var offsetY = Math.sin(angle) * 20; // Desplazamiento en Y
+
+                var gradient = ctx.createRadialGradient(
+                    circle.x + offsetX, circle.y + offsetY, 10, // Origen del gradiente
+                    circle.x + offsetX, circle.y + offsetY, glowRadius // Radio del gradiente
+                );
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(circle.x + offsetX, circle.y + offsetY, glowRadius, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            // Segundo efecto: Gran círculo de luz (dentro del círculo)
+            if (distance <= circle.radius) {
+                var gradient = ctx.createRadialGradient(
+                    circle.x, circle.y, circle.radius, // Origen del gradiente
+                    circle.x, circle.y, flashlightRadius // Radio del gradiente
+                );
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, flashlightRadius, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            // Efecto de explosión de luz
+            if (explosion.active) {
+                var gradient = ctx.createRadialGradient(
+                    circle.x, circle.y, 0, // Origen del gradiente
+                    circle.x, circle.y, explosion.radius // Radio del gradiente
+                );
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, explosion.radius, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Expandir el radio de la explosión
+                explosion.radius += 20; // Aumentar la velocidad de expansión
+                if (explosion.radius > explosion.maxRadius) {
+                    explosion.active = false; // Detener la explosión cuando alcanza el radio máximo
+                }
+            }
+        }
+
+        // Actualizar la posición del mouse
+        c.addEventListener('mousemove', function(event) {
+            var rect = c.getBoundingClientRect();
+            mouse.x = event.clientX - rect.left;
+            mouse.y = event.clientY - rect.top;
+            drawScene(); // Redibujar la escena con los efectos de luz
+        });
+
+        // Detectar clic en el canvas
+        c.addEventListener('click', function(event) {
+            var rect = c.getBoundingClientRect();
+            var clickX = event.clientX - rect.left;
+            var clickY = event.clientY - rect.top;
+
+            // Verificar si el clic fue dentro del círculo
+            var dx = clickX - circle.x;
+            var dy = clickY - circle.y;
+            var distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance <= circle.radius) {
+                explosion.active = true; // Activar la explosión
+                explosion.radius = 0; // Reiniciar el radio de la explosión
+            }
+        });
+
+        // Función para animar la explosión
+        function animate() {
+            if (explosion.active) {
+                drawScene(); // Redibujar la escena si la explosión está activa
+            }
+            requestAnimationFrame(animate); // Continuar la animación
+        }
+
+        // Dibujar la escena inicial y comenzar la animación
+        drawScene();
+        animate();
     </script>
 </body>
 
