@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>el aleph</title>
+</head>
+
+<body class="w3-black">
+    <canvas class="w3-display-middle" id="myCanvas" width="1000" height="1000" style="border:2px solid #6e6e6e;">
+    </canvas>
+    <script>
+        // #region Paredes  
+        //linea 1
+        var c = document.getElementById("myCanvas");
+        var w = c.width;
+        var h = c.height;
+        var ctx = c.getContext("2d");
+        ctx.strokeStyle = "white";
+        ctx.moveTo(0, 0);
+        ctx.lineTo(w / 3, h / 3);
+        ctx.stroke();
+        //linea 2
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.strokeStyle = "white";
+        ctx.moveTo(0, h);
+        ctx.lineTo(w / 3, h / 3 * 2);
+        ctx.stroke();
+        //linea 3
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.strokeStyle = "white";
+        ctx.moveTo(w, 0);
+        ctx.lineTo(w - w / 3, h / 3);
+        ctx.stroke();
+        //linea 4
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.strokeStyle = "white";
+        ctx.moveTo(w, h);
+        ctx.lineTo(w - w / 3, h - h / 3);
+        ctx.stroke();
+        //linea 1 y 2 - techo
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.strokeStyle = "white";
+        ctx.moveTo(w / 3, h / 3);
+        ctx.lineTo(w - w / 3, h / 3);
+        ctx.stroke();
+        //linea 3 y 4 - piso
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.strokeStyle = "white";
+        ctx.moveTo(w - w/3, h - h / 3);
+        ctx.lineTo(w/3, h - h / 3);
+        ctx.stroke();
+
+        //linea 1 y 2 - cornisa
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.strokeStyle = "white";
+        ctx.moveTo(w / 3, h - h / 3);
+        ctx.lineTo(w / 3, h / 3);
+        ctx.stroke();
+        //linea 3 y 4 - cornisa
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.strokeStyle = "white";
+        ctx.moveTo(w - w / 3, h / 3);
+        ctx.lineTo(w - w/ 3, h - h/3);
+        ctx.stroke();
+        // #endregion
+
+        // #region Aleph
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.beginPath();
+        ctx.arc(w /  2, h /  2, 42 , 0, 2 * Math.PI);
+        ctx.stroke();
+        // #endregion
+    </script>
+</body>
+
+</html>
